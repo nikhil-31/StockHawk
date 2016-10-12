@@ -1,11 +1,14 @@
 package com.sam_chordas.android.stockhawk.ui;
 
+import android.content.Context;
 import android.content.Intent;
 import android.graphics.Path;
 import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
 import android.support.v7.widget.Toolbar;
+import android.util.AttributeSet;
 import android.util.Log;
+import android.view.View;
 import android.widget.Toast;
 
 import com.android.volley.Request;
@@ -40,6 +43,8 @@ public class DetailActivity extends AppCompatActivity {
     ArrayList<Stock> stocker = new ArrayList<>();
     List<Entry> entries;
     private DateFormat dateFormat = new SimpleDateFormat("yyyy-MM-dd");
+    LineChart chart;
+    StringBuilder build;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -52,21 +57,12 @@ public class DetailActivity extends AppCompatActivity {
         requestQueue = volleySingleton.getRequestQueue();
         sendJsonRequest();
 
-        LineChart chart = (LineChart) findViewById(R.id.linegraph);
+        build= new StringBuilder();
 
-        entries = new ArrayList<Entry>();
-
-        for(Stock stk : stocker){
-            entries.add(new Entry(stk.getXaxis(),stk.getHigh()));
-
-        }
-
-        LineDataSet dataSet = new LineDataSet(entries,"Label");
-
-        LineData lineData = new LineData(dataSet);
-        chart.setData(lineData);
-        chart.invalidate();
-
+        chart = (LineChart) findViewById(R.id.linegraph);
+        chart.getXAxis().setTextColor(getResources().getColor(android.R.color.white));
+        chart.getAxisLeft().setTextColor(getResources().getColor(android.R.color.white));
+        chart.getAxisRight().setTextColor(getResources().getColor(android.R.color.white));
 
 
     }
@@ -74,7 +70,7 @@ public class DetailActivity extends AppCompatActivity {
     private void sendJsonRequest() {
 
         JsonObjectRequest request = new JsonObjectRequest(Request.Method.GET,
-                "https://query.yahooapis.com/v1/public/yql?q=select%20*%20from%20yahoo.finance.historicaldata%20where%20symbol%20=%20%22YHOO%22%20and%20startDate%20=%20%222009-09-11%22%20and%20endDate%20=%20%222009-10-10%22&format=json&diagnostics=true&env=store%3A%2F%2Fdatatables.org%2Falltableswithkeys&callback=",
+                "https://query.yahooapis.com/v1/public/yql?q=select%20*%20from%20yahoo.finance.historicaldata%20where%20symbol%20=%20%22YHOO%22%20and%20startDate%20=%20%222009-09-11%22%20and%20endDate%20=%20%222010-03-10%22&format=json&diagnostics=true&env=store%3A%2F%2Fdatatables.org%2Falltableswithkeys&callback=",
                 null
                 , new Response.Listener<JSONObject>() {
             @Override
@@ -82,6 +78,19 @@ public class DetailActivity extends AppCompatActivity {
 
                 try {
                     stocker.addAll(parseJSONResponse(response));
+
+                    entries = new ArrayList<Entry>();
+
+                    for(Stock stk : stocker){
+                        entries.add(new Entry(stk.getXaxis(),stk.getHigh()));
+                        build.append("X axis" + stk.getXaxis()+ "High "+stk.getHigh());
+                    }
+
+                    LineDataSet dataSet = new LineDataSet(entries,"Label");
+
+                    LineData lineData = new LineData(dataSet);
+                    chart.setData(lineData);
+                    chart.invalidate();
                 } catch (JSONException e) {
                     e.printStackTrace();
                 }
@@ -120,7 +129,7 @@ public class DetailActivity extends AppCompatActivity {
         JSONObject query = response.getJSONObject(QUERY);
         JSONObject results = query.getJSONObject(RESULTS);
         JSONArray quote = results.getJSONArray(QUOTE);
-        StringBuilder builder = new StringBuilder();
+
         for (int i = 0; i < quote.length(); i++) {
 
             Stock current = new Stock();
@@ -150,10 +159,10 @@ public class DetailActivity extends AppCompatActivity {
             data.add(current);
 
             String x = String.valueOf(xaxis);
-            builder.append("high "+high+" xaxis "+x +" \n");
+
         }
 
-        Toast.makeText(this,builder,Toast.LENGTH_LONG).show();
+
         return data;
     }
 
