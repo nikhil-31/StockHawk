@@ -38,7 +38,7 @@ public class DetailActivity extends AppCompatActivity {
     private VolleySingleton volleySingleton;
     private RequestQueue requestQueue;
     ArrayList<Stock> stocker = new ArrayList<>();
-    ArrayList<YourData> data;
+    List<Entry> entries;
     private DateFormat dateFormat = new SimpleDateFormat("yyyy-MM-dd");
 
     @Override
@@ -52,52 +52,29 @@ public class DetailActivity extends AppCompatActivity {
         requestQueue = volleySingleton.getRequestQueue();
         sendJsonRequest();
 
-        data = new ArrayList<YourData>();
         LineChart chart = (LineChart) findViewById(R.id.linegraph);
 
-        int[] x = {
-                10,20,30,40,50
-        };
-        int[] y = {
-                12, 83, 63, 15, 90
-        };
-        for(int i=0;i<5;i++){
-            YourData s = new YourData(x[i],y[i]);
-            data.add(s);
+        entries = new ArrayList<Entry>();
+
+        for(Stock stk : stocker){
+            entries.add(new Entry(stk.getXaxis(),stk.getHigh()));
+
         }
 
-        List<Entry> entries = new ArrayList<Entry>();
-
-        for (YourData dat : data) {
-
-            // turn your data into Entry objects
-            entries.add(new Entry(dat.getX(), dat.getY()));
-        }
-        /*As a next step, you need to add the List<Entry> you created to a LineDataSet object.
-        DataSet objects hold data which belongs together, and allow individual styling of that data.
-        The below used "Label" has only a descriptive purpose and shows up in the Legend, if enabled.*/
-
-        LineDataSet dataSet = new LineDataSet(entries, "Label");
+        LineDataSet dataSet = new LineDataSet(entries,"Label");
 
         LineData lineData = new LineData(dataSet);
         chart.setData(lineData);
         chart.invalidate();
 
 
-        Bundle extras = getIntent().getExtras();
-        if (extras != null) {
-            int position = extras.getInt("Position");
-//            Toast.makeText(this, " From the main screen at position" + position, Toast.LENGTH_SHORT).show();
-        }
-
 
     }
-
 
     private void sendJsonRequest() {
 
         JsonObjectRequest request = new JsonObjectRequest(Request.Method.GET,
-                "https://query.yahooapis.com/v1/public/yql?q=select%20*%20from%20yahoo.finance.historicaldata%20where%20symbol%20=%20%22YHOO%22%20and%20startDate%20=%20%222009-09-11%22%20and%20endDate%20=%20%222010-03-10%22&format=json&diagnostics=true&env=store%3A%2F%2Fdatatables.org%2Falltableswithkeys&callback=",
+                "https://query.yahooapis.com/v1/public/yql?q=select%20*%20from%20yahoo.finance.historicaldata%20where%20symbol%20=%20%22YHOO%22%20and%20startDate%20=%20%222009-09-11%22%20and%20endDate%20=%20%222009-10-10%22&format=json&diagnostics=true&env=store%3A%2F%2Fdatatables.org%2Falltableswithkeys&callback=",
                 null
                 , new Response.Listener<JSONObject>() {
             @Override
@@ -110,7 +87,6 @@ public class DetailActivity extends AppCompatActivity {
                 }
 //                String s = response.toString();
 //                Toast.makeText(getApplicationContext(), " " + s, Toast.LENGTH_SHORT).show();
-
 
             }
         }, new Response.ErrorListener() {
@@ -162,7 +138,6 @@ public class DetailActivity extends AppCompatActivity {
             float low = (float) jsonObject.getDouble(LOW);
             current.setLow(low);
 
-
             xaxis =  i;
             current.setXaxis(xaxis);
 
@@ -177,9 +152,9 @@ public class DetailActivity extends AppCompatActivity {
             String x = String.valueOf(xaxis);
             builder.append("high "+high+" xaxis "+x +" \n");
         }
+
         Toast.makeText(this,builder,Toast.LENGTH_LONG).show();
         return data;
-
     }
 
 }
