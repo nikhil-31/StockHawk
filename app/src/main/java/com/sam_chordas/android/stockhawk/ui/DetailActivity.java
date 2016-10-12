@@ -14,6 +14,10 @@ import com.android.volley.Response;
 import com.android.volley.VolleyError;
 import com.android.volley.toolbox.ImageLoader;
 import com.android.volley.toolbox.JsonObjectRequest;
+import com.github.mikephil.charting.charts.LineChart;
+import com.github.mikephil.charting.data.Entry;
+import com.github.mikephil.charting.data.LineData;
+import com.github.mikephil.charting.data.LineDataSet;
 import com.sam_chordas.android.stockhawk.R;
 import com.sam_chordas.android.stockhawk.network.VolleySingleton;
 import com.sam_chordas.android.stockhawk.rest.Stock;
@@ -22,12 +26,20 @@ import org.json.JSONArray;
 import org.json.JSONException;
 import org.json.JSONObject;
 
+import java.text.DateFormat;
+import java.text.ParseException;
+import java.text.SimpleDateFormat;
 import java.util.ArrayList;
+import java.util.Date;
+import java.util.List;
 
 public class DetailActivity extends AppCompatActivity {
 
     private VolleySingleton volleySingleton;
     private RequestQueue requestQueue;
+    ArrayList<Stock> stocker = new ArrayList<>();
+    ArrayList<YourData> data;
+    private DateFormat dateFormat = new SimpleDateFormat("yyyy-MM-dd");
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -36,14 +48,48 @@ public class DetailActivity extends AppCompatActivity {
 
         Toolbar toolbar = (Toolbar) findViewById(R.id.toolbar);
 
+        volleySingleton = volleySingleton.getInstance();
+        requestQueue = volleySingleton.getRequestQueue();
+        sendJsonRequest();
+
+        data = new ArrayList<YourData>();
+        LineChart chart = (LineChart) findViewById(R.id.linegraph);
+
+        int[] x = {
+                10,20,30,40,50
+        };
+        int[] y = {
+                12, 83, 63, 15, 90
+        };
+        for(int i=0;i<5;i++){
+            YourData s = new YourData(x[i],y[i]);
+            data.add(s);
+        }
+
+        List<Entry> entries = new ArrayList<Entry>();
+
+        for (YourData dat : data) {
+
+            // turn your data into Entry objects
+            entries.add(new Entry(dat.getX(), dat.getY()));
+        }
+        /*As a next step, you need to add the List<Entry> you created to a LineDataSet object.
+        DataSet objects hold data which belongs together, and allow individual styling of that data.
+        The below used "Label" has only a descriptive purpose and shows up in the Legend, if enabled.*/
+
+        LineDataSet dataSet = new LineDataSet(entries, "Label");
+
+        LineData lineData = new LineData(dataSet);
+        chart.setData(lineData);
+        chart.invalidate();
+
+
         Bundle extras = getIntent().getExtras();
         if (extras != null) {
             int position = extras.getInt("Position");
 //            Toast.makeText(this, " From the main screen at position" + position, Toast.LENGTH_SHORT).show();
         }
-        volleySingleton = volleySingleton.getInstance();
-        requestQueue = volleySingleton.getRequestQueue();
-        sendJsonRequest();
+
 
     }
 
@@ -56,7 +102,7 @@ public class DetailActivity extends AppCompatActivity {
                 , new Response.Listener<JSONObject>() {
             @Override
             public void onResponse(JSONObject response) {
-                ArrayList<Stock> stocker = new ArrayList<>();
+
                 try {
                     stocker.addAll(parseJSONResponse(response));
                 } catch (JSONException e) {
@@ -88,6 +134,7 @@ public class DetailActivity extends AppCompatActivity {
         final String HIGH = "High";
         final String LOW = "Low";
 
+        float xaxis = 0;
         ArrayList<Stock> data = new ArrayList<Stock>();
 
         if (response == null || response.length() == 0) {
@@ -97,7 +144,7 @@ public class DetailActivity extends AppCompatActivity {
         JSONObject query = response.getJSONObject(QUERY);
         JSONObject results = query.getJSONObject(RESULTS);
         JSONArray quote = results.getJSONArray(QUOTE);
-
+        StringBuilder builder = new StringBuilder();
         for (int i = 0; i < quote.length(); i++) {
 
             Stock current = new Stock();
@@ -105,17 +152,34 @@ public class DetailActivity extends AppCompatActivity {
             JSONObject jsonObject = quote.getJSONObject(i);
 
             current.setSymbol(jsonObject.getString(SYMBOL));
-            current.setDate(jsonObject.getString(DATE));
-            current.setOpen(jsonObject.getString(OPEN));
-            current.setHigh(jsonObject.getString(HIGH));
-            current.setLow(jsonObject.getString(LOW));
 
+            float open = (float) jsonObject.getDouble(OPEN);
+            current.setOpen(open);
+
+            float high = (float) jsonObject.getDouble(HIGH);
+            current.setHigh(high);
+
+            float low = (float) jsonObject.getDouble(LOW);
+            current.setLow(low);
+
+
+            xaxis =  i;
+            current.setXaxis(xaxis);
+
+            try {
+                Date date = dateFormat.parse(DATE);
+                current.setDate(date);
+            } catch (ParseException e) {
+                e.printStackTrace();
+            }
             data.add(current);
 
-            String toast = jsonObject.getString(DATE);
-            Toast.makeText(getApplicationContext(),"Symbol "+toast,Toast.LENGTH_SHORT).show();
+            String x = String.valueOf(xaxis);
+            builder.append("high "+high+" xaxis "+x +" \n");
         }
+        Toast.makeText(this,builder,Toast.LENGTH_LONG).show();
         return data;
+
     }
 
 }

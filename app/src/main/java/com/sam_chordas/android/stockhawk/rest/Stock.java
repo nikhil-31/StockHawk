@@ -3,22 +3,35 @@ package com.sam_chordas.android.stockhawk.rest;
 import android.os.Parcel;
 import android.os.Parcelable;
 
+import java.util.Date;
+
 /**
  * Created by nikhil on 11-10-2016.
  */
 
-public class Stock  {
+public class Stock {
+
+
 
     private String symbol;
-    private String date;
-    private String open;
-    private String high;
-    private String low;
+    private Date date;
+    private Float open;
+    private Float high;
+    private Float low;
+
+    public Float getXaxis() {
+        return xaxis;
+    }
+
+    public void setXaxis(Float xaxis) {
+        this.xaxis = xaxis;
+    }
+
+    private Float xaxis;
 
     public Stock() {
 
     }
-
 
     public String getSymbol() {
         return symbol;
@@ -28,38 +41,37 @@ public class Stock  {
         this.symbol = symbol;
     }
 
-    public String getDate() {
+    public Date getDate() {
         return date;
     }
 
-    public void setDate(String date) {
+    public void setDate(Date date) {
         this.date = date;
     }
 
-    public String getOpen() {
+    public Float getOpen() {
         return open;
     }
 
-    public void setOpen(String open) {
+    public void setOpen(Float open) {
         this.open = open;
     }
 
-    public String getHigh() {
+    public Float getHigh() {
         return high;
     }
 
-    public void setHigh(String high) {
+    public void setHigh(Float high) {
         this.high = high;
     }
 
-    public String getLow() {
+    public Float getLow() {
         return low;
     }
 
-    public void setLow(String low) {
+    public void setLow(Float low) {
         this.low = low;
     }
-
 
 
 }
