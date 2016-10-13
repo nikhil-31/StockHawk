@@ -18,6 +18,7 @@ import com.android.volley.VolleyError;
 import com.android.volley.toolbox.ImageLoader;
 import com.android.volley.toolbox.JsonObjectRequest;
 import com.github.mikephil.charting.charts.LineChart;
+import com.github.mikephil.charting.components.XAxis;
 import com.github.mikephil.charting.data.Entry;
 import com.github.mikephil.charting.data.LineData;
 import com.github.mikephil.charting.data.LineDataSet;
@@ -29,11 +30,15 @@ import org.json.JSONArray;
 import org.json.JSONException;
 import org.json.JSONObject;
 
+import java.io.UnsupportedEncodingException;
+import java.net.URLEncoder;
 import java.text.DateFormat;
 import java.text.ParseException;
 import java.text.SimpleDateFormat;
 import java.util.ArrayList;
+import java.util.Calendar;
 import java.util.Date;
+import java.util.GregorianCalendar;
 import java.util.List;
 
 public class DetailActivity extends AppCompatActivity {
@@ -45,6 +50,8 @@ public class DetailActivity extends AppCompatActivity {
     private DateFormat dateFormat = new SimpleDateFormat("yyyy-MM-dd");
     LineChart chart;
     StringBuilder build;
+    String startdate;
+    String enddate;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -57,36 +64,42 @@ public class DetailActivity extends AppCompatActivity {
         requestQueue = volleySingleton.getRequestQueue();
         sendJsonRequest();
 
-        build= new StringBuilder();
+        build = new StringBuilder();
 
         chart = (LineChart) findViewById(R.id.linegraph);
         chart.getXAxis().setTextColor(getResources().getColor(android.R.color.white));
         chart.getAxisLeft().setTextColor(getResources().getColor(android.R.color.white));
         chart.getAxisRight().setTextColor(getResources().getColor(android.R.color.white));
 
+        XAxis xAxis = chart.getXAxis();
+        xAxis.setPosition(XAxis.XAxisPosition.BOTTOM);
 
     }
 
     private void sendJsonRequest() {
 
+        startdate = getStartDate();
+        enddate = getEndDate();
+
         JsonObjectRequest request = new JsonObjectRequest(Request.Method.GET,
-                "https://query.yahooapis.com/v1/public/yql?q=select%20*%20from%20yahoo.finance.historicaldata%20where%20symbol%20=%20%22YHOO%22%20and%20startDate%20=%20%222009-09-11%22%20and%20endDate%20=%20%222010-03-10%22&format=json&diagnostics=true&env=store%3A%2F%2Fdatatables.org%2Falltableswithkeys&callback=",
+                "https://query.yahooapis.com/v1/public/yql?q=select%20*%20from%20yahoo.finance.historicaldata%20where%20symbol%20=%20%22GOOG%22%20and%20startDate%20=%20%222009-09-11%22%20and%20endDate%20=%20%222010-03-10%22&format=json&diagnostics=true&env=store%3A%2F%2Fdatatables.org%2Falltableswithkeys&callback=",
                 null
                 , new Response.Listener<JSONObject>() {
             @Override
             public void onResponse(JSONObject response) {
 
                 try {
+
                     stocker.addAll(parseJSONResponse(response));
 
                     entries = new ArrayList<Entry>();
 
-                    for(Stock stk : stocker){
-                        entries.add(new Entry(stk.getXaxis(),stk.getHigh()));
-                        build.append("X axis" + stk.getXaxis()+ "High "+stk.getHigh());
+                    for (Stock stk : stocker) {
+                        entries.add(new Entry(stk.getXaxis(), stk.getHigh()));
+                        build.append("X axis" + stk.getXaxis() + "High " + stk.getHigh());
                     }
 
-                    LineDataSet dataSet = new LineDataSet(entries,"Label");
+                    LineDataSet dataSet = new LineDataSet(entries, "Label");
 
                     LineData lineData = new LineData(dataSet);
                     chart.setData(lineData);
@@ -94,8 +107,6 @@ public class DetailActivity extends AppCompatActivity {
                 } catch (JSONException e) {
                     e.printStackTrace();
                 }
-//                String s = response.toString();
-//                Toast.makeText(getApplicationContext(), " " + s, Toast.LENGTH_SHORT).show();
 
             }
         }, new Response.ErrorListener() {
@@ -147,7 +158,7 @@ public class DetailActivity extends AppCompatActivity {
             float low = (float) jsonObject.getDouble(LOW);
             current.setLow(low);
 
-            xaxis =  i;
+            xaxis = i;
             current.setXaxis(xaxis);
 
             try {
@@ -164,6 +175,27 @@ public class DetailActivity extends AppCompatActivity {
 
 
         return data;
+    }
+
+    public String getEndDate() {
+        Calendar calendar = Calendar.getInstance();
+        SimpleDateFormat mdformat = new SimpleDateFormat("yyyy-MM-dd");
+        String endDate = mdformat.format(calendar.getTime());
+        return endDate;
+    }
+
+    public String getStartDate() {
+        Calendar cal = GregorianCalendar.getInstance();
+        cal.setTime(new Date());
+        cal.add(Calendar.DAY_OF_YEAR, -7);
+        Date startDate = cal.getTime();
+        SimpleDateFormat mdformat = new SimpleDateFormat("yyyy-MM-dd");
+        String startString = mdformat.format(startDate);
+        return startString;
+    }
+
+    public String formatDateString(String date) {
+        return date.substring(5);
     }
 
 }
