@@ -15,7 +15,7 @@ import com.android.volley.Request;
 import com.android.volley.RequestQueue;
 import com.android.volley.Response;
 import com.android.volley.VolleyError;
-import com.android.volley.toolbox.ImageLoader;
+
 import com.android.volley.toolbox.JsonObjectRequest;
 import com.github.mikephil.charting.charts.LineChart;
 import com.github.mikephil.charting.components.XAxis;
@@ -45,20 +45,23 @@ public class DetailActivity extends AppCompatActivity {
 
     private VolleySingleton volleySingleton;
     private RequestQueue requestQueue;
-    ArrayList<Stock> stocker = new ArrayList<>();
-    List<Entry> entries;
+    private ArrayList<Stock> stocker = new ArrayList<>();
+    private List<Entry> entries;
     private DateFormat dateFormat = new SimpleDateFormat("yyyy-MM-dd");
-    LineChart chart;
-    StringBuilder build;
-    String startdate;
-    String enddate;
+    private LineChart chart;
+    private StringBuilder build;
+    private String startdate;
+    private String enddate;
+    private String mSymbol;
+
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_detail);
 
-        Toolbar toolbar = (Toolbar) findViewById(R.id.toolbar);
+        Intent intent = getIntent();
+        mSymbol = intent.getStringExtra(getString(R.string.symbol));
 
         volleySingleton = volleySingleton.getInstance();
         requestQueue = volleySingleton.getRequestQueue();
@@ -81,8 +84,15 @@ public class DetailActivity extends AppCompatActivity {
         startdate = getStartDate();
         enddate = getEndDate();
 
+        Log.d("Start date", getStartDate());
+        Log.d("End date", getEndDate());
+
+        String url = "https://query.yahooapis.com/v1/public/yql?q=select%20*%20from%20yahoo.finance.historicaldata%20where%20symbol%20=%20%22" + mSymbol + "%22%20and%20startDate%20=%20%22" + startdate + "%22%20and%20endDate%20=%20%22" + enddate + "%22&format=json&diagnostics=true&env=store%3A%2F%2Fdatatables.org%2Falltableswithkeys&callback=";
+
+        Log.d("URL ", url);
+
         JsonObjectRequest request = new JsonObjectRequest(Request.Method.GET,
-                "https://query.yahooapis.com/v1/public/yql?q=select%20*%20from%20yahoo.finance.historicaldata%20where%20symbol%20=%20%22GOOG%22%20and%20startDate%20=%20%222009-09-11%22%20and%20endDate%20=%20%222010-03-10%22&format=json&diagnostics=true&env=store%3A%2F%2Fdatatables.org%2Falltableswithkeys&callback=",
+                url,
                 null
                 , new Response.Listener<JSONObject>() {
             @Override
@@ -96,7 +106,7 @@ public class DetailActivity extends AppCompatActivity {
 
                     for (Stock stk : stocker) {
                         entries.add(new Entry(stk.getXaxis(), stk.getHigh()));
-                        build.append("X axis" + stk.getXaxis() + "High " + stk.getHigh());
+
                     }
 
                     LineDataSet dataSet = new LineDataSet(entries, "Label");

@@ -62,7 +62,7 @@ public class StockTaskService extends GcmTaskService {
             // Base URL for the Yahoo query
             urlStringBuilder.append("https://query.yahooapis.com/v1/public/yql?q=");
 
-            //URLEncoder.encode adds a + sign to all the white spaces so that it can be supported by html
+
 
             urlStringBuilder.append(URLEncoder.encode("select * from yahoo.finance.quotes where symbol "
                     + "in (", "UTF-8"));

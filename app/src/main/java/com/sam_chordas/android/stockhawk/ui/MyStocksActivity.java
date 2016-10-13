@@ -89,13 +89,14 @@ public class MyStocksActivity extends AppCompatActivity implements LoaderManager
                 new RecyclerViewItemClickListener.OnItemClickListener() {
                     @Override
                     public void onItemClick(View v, int position) {
-                        //TODO:
-                        // do something on item click
-//
+
+                        //Starting the chart activity
+                        mCursor.moveToPosition(position);
+                        String symbol = mCursor.getString(mCursor.getColumnIndex("symbol"));
                         Intent intent = new Intent(getApplicationContext(),DetailActivity.class);
-                        intent.putExtra("Position",position);
+                        intent.putExtra(getString(R.string.symbol),symbol);
                         startActivity(intent);
-//                        Toast.makeText(mContext," This position was clicked "+position ,Toast.LENGTH_SHORT).show();
+
                     }
                 }));
         recyclerView.setAdapter(mCursorAdapter);
