@@ -18,9 +18,10 @@
 
     </android.support.design.widget.AppBarLayout>
 
-    <com.github.mikephil.charting.charts.LineChart
+    <com.db.chart.view.LineChartView
+        android:id="@+id/linechart"
         android:layout_width="match_parent"
         android:layout_height="match_parent"
-        android:id="@+id/linegraph"/>
+        />
 
 </android.support.design.widget.CoordinatorLayout>

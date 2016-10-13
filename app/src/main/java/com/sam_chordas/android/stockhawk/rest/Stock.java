@@ -19,6 +19,16 @@ public class Stock {
     private Float high;
     private Float low;
 
+    public String getDateString() {
+        return dateString;
+    }
+
+    public void setDateString(String dateString) {
+        this.dateString = dateString;
+    }
+
+    private String dateString;
+
     public Float getXaxis() {
         return xaxis;
     }

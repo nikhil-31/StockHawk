@@ -3,6 +3,8 @@ package com.sam_chordas.android.stockhawk.ui;
 import android.content.Context;
 import android.content.Intent;
 import android.graphics.Path;
+import android.graphics.Rect;
+import android.support.v4.content.ContextCompat;
 import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
 import android.support.v7.widget.Toolbar;
@@ -17,6 +19,9 @@ import com.android.volley.Response;
 import com.android.volley.VolleyError;
 
 import com.android.volley.toolbox.JsonObjectRequest;
+import com.db.chart.listener.OnEntryClickListener;
+import com.db.chart.model.LineSet;
+import com.db.chart.view.LineChartView;
 import com.github.mikephil.charting.charts.LineChart;
 import com.github.mikephil.charting.components.XAxis;
 import com.github.mikephil.charting.data.Entry;
@@ -48,11 +53,13 @@ public class DetailActivity extends AppCompatActivity {
     private ArrayList<Stock> stocker = new ArrayList<>();
     private List<Entry> entries;
     private DateFormat dateFormat = new SimpleDateFormat("yyyy-MM-dd");
-    private LineChart chart;
     private StringBuilder build;
     private String startdate;
     private String enddate;
     private String mSymbol;
+    private String[] labels;
+    private float[] values;
+    Context mContext;
 
 
     @Override
@@ -62,20 +69,16 @@ public class DetailActivity extends AppCompatActivity {
 
         Intent intent = getIntent();
         mSymbol = intent.getStringExtra(getString(R.string.symbol));
-
+        mContext = getApplicationContext();
         volleySingleton = volleySingleton.getInstance();
         requestQueue = volleySingleton.getRequestQueue();
         sendJsonRequest();
 
         build = new StringBuilder();
 
-        chart = (LineChart) findViewById(R.id.linegraph);
-        chart.getXAxis().setTextColor(getResources().getColor(android.R.color.white));
-        chart.getAxisLeft().setTextColor(getResources().getColor(android.R.color.white));
-        chart.getAxisRight().setTextColor(getResources().getColor(android.R.color.white));
+        LineChartView lineChartView = (LineChartView)findViewById(R.id.linechart);
 
-        XAxis xAxis = chart.getXAxis();
-        xAxis.setPosition(XAxis.XAxisPosition.BOTTOM);
+
 
     }
 
@@ -83,6 +86,7 @@ public class DetailActivity extends AppCompatActivity {
 
         startdate = getStartDate();
         enddate = getEndDate();
+
 
         Log.d("Start date", getStartDate());
         Log.d("End date", getEndDate());
@@ -101,19 +105,57 @@ public class DetailActivity extends AppCompatActivity {
                 try {
 
                     stocker.addAll(parseJSONResponse(response));
+                    int stocksize = stocker.size();
 
-                    entries = new ArrayList<Entry>();
+                    labels = new String[stocker.size()];
+                    values = new float[stocker.size()];
 
-                    for (Stock stk : stocker) {
-                        entries.add(new Entry(stk.getXaxis(), stk.getHigh()));
+                    int min = Math.round(stocker.get(1).getLow());
+                    int max = Math.round(stocker.get(1).getHigh());
 
+
+                    for(int i = 0; i < stocker.size(); i++) {
+                        Stock stocking = stocker.get(i);
+                        Float yaxis = stocking.getHigh();
+                        String date = formatDateString(stocking.getDateString());
+
+
+                        //need to put in the values opposite from how they are read
+
+                        labels[stocker.size()-1-i] = date;
+                        values[stocker.size()-1-i] = yaxis;
                     }
 
-                    LineDataSet dataSet = new LineDataSet(entries, "Label");
+                    LineSet dataset = new LineSet(labels, values);
+                    dataset.setColor(ContextCompat.getColor(mContext, R.color.material_green_700));
+                    LineChartView lineChartView = (LineChartView)findViewById(R.id.linechart);
+                    lineChartView.addData(dataset);
+                    lineChartView.setAxisColor(ContextCompat.getColor(mContext, R.color.md_divider_white));
+                    lineChartView.setLabelsColor(0xffffffff);
+                    dataset.setDotsRadius(18);
+                    dataset.setDotsColor(ContextCompat.getColor(mContext, R.color.material_green_700));
+                    lineChartView.setOnEntryClickListener(new OnEntryClickListener() {
+                        @Override
+                        public void onClick(int setIndex, int entryIndex, Rect rect) {
+                            StringBuilder priceString = new StringBuilder();
+                            priceString.append("$")
+                                    .append(values[entryIndex]);
+                            Toast.makeText(getApplicationContext(), priceString, Toast.LENGTH_SHORT).show();
+                        }
+                    });
 
-                    LineData lineData = new LineData(dataSet);
-                    chart.setData(lineData);
-                    chart.invalidate();
+
+                    lineChartView.setAxisBorderValues(min-10, max+10);
+                    //display table
+                    lineChartView.show();
+
+
+
+
+
+
+
+
                 } catch (JSONException e) {
                     e.printStackTrace();
                 }
@@ -170,6 +212,8 @@ public class DetailActivity extends AppCompatActivity {
 
             xaxis = i;
             current.setXaxis(xaxis);
+
+            current.setDateString(jsonObject.getString(DATE));
 
             try {
                 Date date = dateFormat.parse(DATE);
