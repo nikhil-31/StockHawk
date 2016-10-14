@@ -15,6 +15,7 @@ import android.support.v7.widget.LinearLayoutManager;
 import android.support.v7.widget.RecyclerView;
 import android.support.v7.widget.helper.ItemTouchHelper;
 import android.text.InputType;
+import android.util.Log;
 import android.view.Gravity;
 import android.view.Menu;
 import android.view.MenuItem;
@@ -61,9 +62,6 @@ public class MyStocksActivity extends AppCompatActivity implements LoaderManager
         super.onCreate(savedInstanceState);
         mContext = this;
 
-        textEmpty= (TextView) findViewById(R.id.text_message);
-
-
         //Connectivity check
         ConnectivityManager cm =
                 (ConnectivityManager) mContext.getSystemService(Context.CONNECTIVITY_SERVICE);
@@ -85,6 +83,10 @@ public class MyStocksActivity extends AppCompatActivity implements LoaderManager
                 networkToast();
             }
         }
+
+        //Textview that appears when nothing is present in the list or there is no network connection
+        textEmpty= (TextView) findViewById(R.id.text_message);
+
         RecyclerView recyclerView = (RecyclerView) findViewById(R.id.recycler_view);
         recyclerView.setLayoutManager(new LinearLayoutManager(this));
         getLoaderManager().initLoader(CURSOR_LOADER_ID, null, this);
@@ -98,8 +100,8 @@ public class MyStocksActivity extends AppCompatActivity implements LoaderManager
                         //Starting the chart activity
                         mCursor.moveToPosition(position);
                         String symbol = mCursor.getString(mCursor.getColumnIndex("symbol"));
-                        Intent intent = new Intent(getApplicationContext(),DetailActivity.class);
-                        intent.putExtra(getString(R.string.symbol),symbol);
+                        Intent intent = new Intent(getApplicationContext(), DetailActivity.class);
+                        intent.putExtra(getString(R.string.symbol), symbol);
                         startActivity(intent);
 
                     }
@@ -123,7 +125,7 @@ public class MyStocksActivity extends AppCompatActivity implements LoaderManager
                                     // in the DB and proceed accordingly
                                     Cursor c = getContentResolver().query(QuoteProvider.Quotes.CONTENT_URI,
                                             new String[]{QuoteColumns.SYMBOL}, QuoteColumns.SYMBOL + "= ?",
-                                            new String[]{input.toString()}, null);
+                                            new String[]{input.toString().toUpperCase()}, null);
                                     if (c.getCount() != 0) {
                                         Toast toast =
                                                 Toast.makeText(MyStocksActivity.this, getString(R.string.stockSaved),
@@ -134,7 +136,7 @@ public class MyStocksActivity extends AppCompatActivity implements LoaderManager
                                     } else {
                                         // Add the stock to DB
                                         mServiceIntent.putExtra("tag", "add");
-                                        mServiceIntent.putExtra("symbol", input.toString());
+                                        mServiceIntent.putExtra("symbol", input.toString().toUpperCase());
                                         startService(mServiceIntent);
                                     }
                                 }
@@ -172,13 +174,14 @@ public class MyStocksActivity extends AppCompatActivity implements LoaderManager
             // are updated.
             GcmNetworkManager.getInstance(this).schedule(periodicTask);
         }
-//        refreshLayout();
+//        CheckLayout();
     }
 
 
-    public void refreshLayout() {
+    public void CheckLayout() {
         if (isConnected) {
             if (mCursorAdapter.getItemCount() == 0) {
+                Log.d("Item Count "," "+ mCursorAdapter.getItemCount());
                 textEmpty.setText(R.string.none_selected);
                 textEmpty.setVisibility(View.VISIBLE);
             } else {

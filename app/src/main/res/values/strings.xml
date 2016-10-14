@@ -13,6 +13,9 @@
     <string name="symbol">symbol</string>
 
     <string name="none_selected">Press the + button to add a stock</string>
-    <string name="app_offline">No internet connection! Stocks may be out of date&#8230;</string>
+    <string name="app_offline">No internet connection! Stocks may be out of date</string>
+
     <string name="stockSaved">This stock is already saved!</string>
+
+    <string name="invalidSymbol">Invalid symbol</string>
 </resources>
