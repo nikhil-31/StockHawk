@@ -19,6 +19,7 @@ import android.view.Gravity;
 import android.view.Menu;
 import android.view.MenuItem;
 import android.view.View;
+import android.widget.TextView;
 import android.widget.Toast;
 
 import com.afollestad.materialdialogs.MaterialDialog;
@@ -53,11 +54,15 @@ public class MyStocksActivity extends AppCompatActivity implements LoaderManager
     private Context mContext;
     private Cursor mCursor;
     boolean isConnected;
+    TextView textEmpty;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         mContext = this;
+
+        textEmpty= (TextView) findViewById(R.id.text_message);
+
 
         //Connectivity check
         ConnectivityManager cm =
@@ -121,7 +126,7 @@ public class MyStocksActivity extends AppCompatActivity implements LoaderManager
                                             new String[]{input.toString()}, null);
                                     if (c.getCount() != 0) {
                                         Toast toast =
-                                                Toast.makeText(MyStocksActivity.this, "This stock is already saved!",
+                                                Toast.makeText(MyStocksActivity.this, getString(R.string.stockSaved),
                                                         Toast.LENGTH_LONG);
                                         toast.setGravity(Gravity.CENTER, Gravity.CENTER, 0);
                                         toast.show();
@@ -167,8 +172,28 @@ public class MyStocksActivity extends AppCompatActivity implements LoaderManager
             // are updated.
             GcmNetworkManager.getInstance(this).schedule(periodicTask);
         }
+//        refreshLayout();
     }
 
+
+    public void refreshLayout() {
+        if (isConnected) {
+            if (mCursorAdapter.getItemCount() == 0) {
+                textEmpty.setText(R.string.none_selected);
+                textEmpty.setVisibility(View.VISIBLE);
+            } else {
+                textEmpty.setVisibility(View.GONE);
+            }
+        } else {
+            if (mCursorAdapter.getItemCount() == 0) {
+                textEmpty.setText(R.string.network_toast);
+                textEmpty.setVisibility(View.VISIBLE);
+            } else {
+                textEmpty.setVisibility(View.GONE);
+                Toast.makeText(this, R.string.app_offline, Toast.LENGTH_SHORT).show();
+            }
+        }
+    }
 
     @Override
     public void onResume() {
@@ -201,10 +226,6 @@ public class MyStocksActivity extends AppCompatActivity implements LoaderManager
         // as you specify a parent activity in AndroidManifest.xml.
         int id = item.getItemId();
 
-        //noinspection SimplifiableIfStatement
-        if (id == R.id.action_settings) {
-            return true;
-        }
 
         if (id == R.id.action_change_units) {
             // this is for changing stock changes from percent value to dollar value
