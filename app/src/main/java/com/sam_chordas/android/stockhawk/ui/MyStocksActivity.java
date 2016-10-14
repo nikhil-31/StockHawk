@@ -174,21 +174,29 @@ public class MyStocksActivity extends AppCompatActivity implements LoaderManager
             // are updated.
             GcmNetworkManager.getInstance(this).schedule(periodicTask);
         }
-//        CheckLayout();
+
     }
 
 
     public void CheckLayout() {
+
         if (isConnected) {
+
             if (mCursorAdapter.getItemCount() == 0) {
                 Log.d("Item Count "," "+ mCursorAdapter.getItemCount());
                 textEmpty.setText(R.string.none_selected);
                 textEmpty.setVisibility(View.VISIBLE);
-            } else {
-                textEmpty.setVisibility(View.GONE);
             }
+            else {
+
+                textEmpty.setVisibility(View.GONE);
+
+            }
+
         } else {
+
             if (mCursorAdapter.getItemCount() == 0) {
+
                 textEmpty.setText(R.string.network_toast);
                 textEmpty.setVisibility(View.VISIBLE);
             } else {
@@ -258,6 +266,7 @@ public class MyStocksActivity extends AppCompatActivity implements LoaderManager
     public void onLoadFinished(Loader<Cursor> loader, Cursor data) {
         mCursorAdapter.swapCursor(data);
         mCursor = data;
+        CheckLayout();
     }
 
     @Override
