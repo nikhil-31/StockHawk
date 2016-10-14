@@ -78,15 +78,12 @@ public class DetailActivity extends AppCompatActivity {
 
         LineChartView lineChartView = (LineChartView)findViewById(R.id.linechart);
 
-
-
     }
 
     private void sendJsonRequest() {
 
         startdate = getStartDate();
         enddate = getEndDate();
-
 
         Log.d("Start date", getStartDate());
         Log.d("End date", getEndDate());
@@ -107,6 +104,7 @@ public class DetailActivity extends AppCompatActivity {
                     stocker.addAll(parseJSONResponse(response));
                     int stocksize = stocker.size();
 
+                    //The dataset for the
                     labels = new String[stocker.size()];
                     values = new float[stocker.size()];
 
@@ -118,6 +116,9 @@ public class DetailActivity extends AppCompatActivity {
                         Stock stocking = stocker.get(i);
                         Float yaxis = stocking.getHigh();
                         String date = formatDateString(stocking.getDateString());
+
+                        min = Math.min(min, Math.round(yaxis));
+                        max = Math.max(max, Math.round(yaxis));
 
 
                         //need to put in the values opposite from how they are read
@@ -145,14 +146,9 @@ public class DetailActivity extends AppCompatActivity {
                     });
 
 
-                    lineChartView.setAxisBorderValues(min-10, max+10);
+                    lineChartView.setAxisBorderValues(min-1, max+1);
                     //display table
                     lineChartView.show();
-
-
-
-
-
 
 
 
