@@ -1,25 +1,34 @@
 <resources>
+    <!--The name of the application  -->
     <string name="app_name" translatable="false">Stock Hawk</string>
+
+    <!--The name of the chart activity -->
     <string name="detail_activity">Detail</string>
     <string name="action_example">Example action</string>
 
     <string name="action_settings">Settings</string>
-
+    <!--Text change percentage and dollar value by clicking a button in the action bar -->
     <string name="action_change_units">Change Units</string>
 
+    <!--Part of the dialog to add a new stock -->
     <string name="symbol_search">Symbol Search</string>
     <string name="content_test">Search for a Stock Symbol</string>
     <string name="input_hint" translatable="false">FB</string>
     <string name="input_prefill"></string>
 
+    <!--Toast message to show that there is no network -->
     <string name="network_toast">Uh-oh! This app requires an internet connection</string>
 
-    <string name="symbol">symbol</string>
+    <!--Used a label for an intent to launch the details activity  -->
+    <string name="symbol" translatable="false">symbol</string>
 
+    <!-- Displayed when there are no stock entries in the recycler view -->
     <string name="none_selected">Press the + button to add a stock</string>
     <string name="app_offline">No internet connection! Stocks may be out of date</string>
 
+    <!-- Displayed as a toast when the user adds the same stock again -->
     <string name="stockSaved">This stock is already saved!</string>
 
+    <!--Displayed as a toast when the user adds an invalid stock symbol -->
     <string name="invalidSymbol">Invalid symbol</string>
 </resources>
