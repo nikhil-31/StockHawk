@@ -32,5 +32,6 @@
     <!--Displayed as a toast when the user adds an invalid stock symbol -->
     <string name="invalidSymbol">Invalid symbol</string>
     <string name="stockUnavailable">Stock not available</string>
+    <string name="content_description">Add new stock</string>
 
 </resources>
