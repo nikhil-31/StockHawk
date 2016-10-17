@@ -16,9 +16,7 @@ import com.sam_chordas.android.stockhawk.service.StockTaskService;
 import com.sam_chordas.android.stockhawk.ui.DetailActivity;
 import com.sam_chordas.android.stockhawk.ui.MyStocksActivity;
 
-/**
- * Implementation of App Widget functionality.
- */
+
 public class NewAppWidget extends AppWidgetProvider {
 
 
@@ -45,7 +43,7 @@ public class NewAppWidget extends AppWidgetProvider {
 
             views.setPendingIntentTemplate(R.id.widget_list,clickPendingIntent);
 
-
+            views.setEmptyView(R.id.widget_list,R.id.widget_empty);
             // Instruct the widget manager to update the widget
             appWidgetManager.updateAppWidget(appWidgetId, views);
 
