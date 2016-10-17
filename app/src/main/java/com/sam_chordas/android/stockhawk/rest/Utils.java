@@ -1,6 +1,9 @@
 package com.sam_chordas.android.stockhawk.rest;
 
 import android.content.ContentProviderOperation;
+import android.content.Context;
+import android.content.Intent;
+import android.support.v4.content.LocalBroadcastManager;
 import android.util.Log;
 import android.widget.Toast;
 
@@ -51,6 +54,11 @@ public class Utils {
         }
         return batchOperations;
     }
+    private static void sendBroadcast(String broadcast, Context context) {
+        Intent i = new Intent("stock-not-found");
+        i.putExtra("broadcast", broadcast);
+        LocalBroadcastManager.getInstance(context).sendBroadcast(i);
+    }
 
     public static String truncateBidPrice(String bidPrice) {
         if(bidPrice != null) {
@@ -90,6 +98,7 @@ public class Utils {
                     jsonObject.getString("ChangeinPercent"), true));
             builder.withValue(QuoteColumns.CHANGE, truncateChange(change, false));
             builder.withValue(QuoteColumns.ISCURRENT, 1);
+            builder.withValue(QuoteColumns.NAME, jsonObject.getString("Name"));
             if (change.charAt(0) == '-') {
                 builder.withValue(QuoteColumns.ISUP, 0);
             } else {

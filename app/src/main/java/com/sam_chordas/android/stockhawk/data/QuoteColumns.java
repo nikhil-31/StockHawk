@@ -21,6 +21,9 @@ public class QuoteColumns {
     public static final String PERCENT_CHANGE = "percent_change";
     @DataType(DataType.Type.TEXT)
     @NotNull
+    public static final String NAME = "Name";
+    @DataType(DataType.Type.TEXT)
+    @NotNull
     public static final String CHANGE = "change";
     @DataType(DataType.Type.TEXT)
     @NotNull

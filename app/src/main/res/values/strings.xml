@@ -31,4 +31,7 @@
 
     <!--Displayed as a toast when the user adds an invalid stock symbol -->
     <string name="invalidSymbol">Invalid symbol</string>
+    <string name="stockUnavailable">Stock not available</string>
+
+    <string name="appwidget_text">EXAMPLE</string>
 </resources>
