@@ -36,7 +36,9 @@ public class WidgetService extends RemoteViewsService {
         },
                 QuoteColumns.ISCURRENT + " = ?",
                 new String[]{"1"}, null);
+        cursor.close();
         return new WidgetDataProvider(this, intent, cursor);
+
     }
 
     public class WidgetDataProvider implements RemoteViewsService.RemoteViewsFactory {
@@ -96,6 +98,9 @@ public class WidgetService extends RemoteViewsService {
             remoteViews.setTextViewText(R.id.change,
                     mCursor.getString(mCursor.getColumnIndex(QuoteColumns.CHANGE)));
 
+            final Intent intentGraph = new Intent();
+            intentGraph.putExtra(getString(R.string.symbol), mCursor.getString(mCursor.getColumnIndex(QuoteColumns.SYMBOL)).toUpperCase());
+            remoteViews.setOnClickFillInIntent(R.id.widget_list_item,intentGraph);
 
             Log.e(TAG, "getViewAt: " + mCursor.getString(mCursor.getColumnIndex(QuoteColumns.SYMBOL)));
             return remoteViews;

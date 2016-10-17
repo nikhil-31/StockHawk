@@ -1,6 +1,7 @@
 package com.sam_chordas.android.stockhawk.widget;
 
 import android.app.PendingIntent;
+import android.app.TaskStackBuilder;
 import android.appwidget.AppWidgetManager;
 import android.appwidget.AppWidgetProvider;
 import android.content.ComponentName;
@@ -12,6 +13,7 @@ import android.widget.Toast;
 
 import com.sam_chordas.android.stockhawk.R;
 import com.sam_chordas.android.stockhawk.service.StockTaskService;
+import com.sam_chordas.android.stockhawk.ui.DetailActivity;
 import com.sam_chordas.android.stockhawk.ui.MyStocksActivity;
 
 /**
@@ -36,6 +38,13 @@ public class NewAppWidget extends AppWidgetProvider {
             views.setOnClickPendingIntent(R.id.widget_bar, pendingIntent);
 
             views.setRemoteAdapter(R.id.widget_list, new Intent(context, WidgetService.class));
+
+            PendingIntent clickPendingIntent = TaskStackBuilder.create(context)
+                    .addNextIntentWithParentStack(new Intent(context, DetailActivity.class))
+                    .getPendingIntent(0,PendingIntent.FLAG_UPDATE_CURRENT);
+
+            views.setPendingIntentTemplate(R.id.widget_list,clickPendingIntent);
+
 
             // Instruct the widget manager to update the widget
             appWidgetManager.updateAppWidget(appWidgetId, views);
