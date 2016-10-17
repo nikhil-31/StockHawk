@@ -26,7 +26,7 @@ public class NewAppWidget extends AppWidgetProvider {
         for (int appWidgetId : appWidgetIds) {
 
 
-            CharSequence widgetText = context.getString(R.string.appwidget_text);
+
 
             // Construct the RemoteViews object
             RemoteViews views = new RemoteViews(context.getPackageName(), R.layout.new_app_widget);
