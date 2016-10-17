@@ -14,13 +14,15 @@ import java.util.ArrayList;
  */
 public class WidgetService extends RemoteViewsService {
     private static final String TAG = "WIDGET";
-    @Override public RemoteViewsFactory onGetViewFactory(Intent intent) {
 
-        ArrayList list= new ArrayList();
-        Cursor cursor = this.getContentResolver().query(QuoteProvider.Quotes.CONTENT_URI, new String[] {
+    @Override
+    public RemoteViewsFactory onGetViewFactory(Intent intent) {
+
+        ArrayList list = new ArrayList();
+        Cursor cursor = this.getContentResolver().query(QuoteProvider.Quotes.CONTENT_URI, new String[]{
                 QuoteColumns._ID, QuoteColumns.SYMBOL, QuoteColumns.BIDPRICE, QuoteColumns.PERCENT_CHANGE,
                 QuoteColumns.CHANGE, QuoteColumns.ISUP, QuoteColumns.NAME
-        }, QuoteColumns.ISCURRENT + " = ?", new String[] { "1" }, null);
-        return new WidgetDataProvider(this, intent,cursor);
+        }, QuoteColumns.ISCURRENT + " = ?", new String[]{"1"}, null);
+        return new WidgetDataProvider(this, intent, cursor);
     }
 }
