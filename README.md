@@ -5,6 +5,9 @@ An Android app for monitoring stocks. This will replace Project 3 in the Android
 This application shows a list of stock quotes on the main screen with a floating action button to add new stocks. Clicking on 
 one of the stock quotes will take the user to a details screen with a graph to display the value over time of the stocks. 
 
+The widget shows the prices of individual stock quotes clicking on a quote will take the user to the detail screen which has a graph
+with the value of the stock overtime.
+
 ##Libraries used
 
 * William chart
